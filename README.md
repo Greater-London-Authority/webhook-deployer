@@ -1,6 +1,6 @@
 # Webook deployer
 
-`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extacts its contents to a specified directory. 
+`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extracts its contents to a specified directory. 
 
 ## Motivating problem
 
@@ -34,7 +34,7 @@ Build: `go build .`
 
 ### Creating a GitHub token
 
-In order to donload build artifacts, `webhook-deployer` needs to be provided a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with  `Read-only` access to the `Actions` and `Metadata` Repository Permissions scopes.
+In order to download build artifacts, `webhook-deployer` needs to be provided a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with  `Read-only` access to the `Actions` and `Metadata` Repository Permissions scopes.
 
 
 ### Running webhook-deployer
@@ -93,8 +93,8 @@ jobs:
 In the `Webhooks` section of the repo settings, you will also need to create a webhook:
 
 * set the `Payload URL` to the appropriate URL (the IP address/domain name of your server and the port defined in the config file, or whever it is proxied if you are using a reverse proxy)
-* set the `Secret` to a random value, and record the same value in the config file. This si sued to verify that webhook requests came from GitHub.
-* select the `Let me select individuual events` option for `Which events would you like to trigger this webhook?`, and then selct `Workflow runs`.
+* set the `Secret` to a random value, and record the same value in the config file. This is used to verify that webhook requests came from GitHub.
+* select the `Let me select individuual events` option for `Which events would you like to trigger this webhook?`, and then select `Workflow runs`.
 
 
 #### In the webhook-deployer config
