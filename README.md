@@ -47,14 +47,14 @@ You can redirect logging output to a file and detatch with:
 
     ./webhook-deployer webhook-config.json >> ./webhooks.log 2>&1
 
-You may want to prxy requests with a server such as nginx.
+You may want to proxy requests with a server such as nginx.
 
 
 ### Configuring deployment for a repository
 
 #### On GitHub
 
-You will need to ctreat a YAML file in the `.github/workflows` diectory of your repo. Here is an example
+You will need to create a YAML file in the `.github/workflows` diectory of your repo. Here is an example
 
 
 ```yaml
