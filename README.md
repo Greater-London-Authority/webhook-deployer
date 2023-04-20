@@ -32,25 +32,27 @@ Build: `go build .`
 
 ## Deployment
 
-### GitHub token
+### Creating a GitHub token
 
 In order to donload build artifacts, `webhook-deployer` needs to be provided a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with  `Read-only` access to the `Actions` and `Metadata` Repository Permissions scopes.
 
 
-### On the server
+### Running webhook-deployer
 
 Create a config file, using [`config.json`](./config.json) as a template.
 
 You then need to run the service, passing the name/path of the config file as an argument is if is not `./config.json`.
 
-You can redirect logging output to a file and detatach with:
+You can redirect logging output to a file and detatch with:
 
-    ./webhooks webhook-config.json >> ./webhooks.log 2>&1
+    ./webhook-deployer webhook-config.json >> ./webhooks.log 2>&1
 
 You may want to prxy requests with a server such as nginx.
 
 
-### On GitHub
+### Configuring deployment for a repository
+
+#### On GitHub
 
 You will need to ctreat a YAML file in the `.github/workflows` diectory of your repo. Here is an example
 
@@ -93,6 +95,15 @@ In the `Webhooks` section of the repo settings, you will also need to create a w
 * set the `Payload URL` to the appropriate URL (the IP address/domain name of your server and the port defined in the config file, or whever it is proxied if you are using a reverse proxy)
 * set the `Secret` to a random value, and record the same value in the config file. This si sued to verify that webhook requests came from GitHub.
 * select the `Let me select individuual events` option for `Which events would you like to trigger this webhook?`, and then selct `Workflow runs`.
+
+
+#### In the webhook-deployer config
+
+Add an entry to the `projects` key of the config file, that specified:
+
+* `repository`: the full neame of the repository (e.g., *<org or account name>/<project name>*)
+* `destination`: the path on the system where the contents of the artifact zip file should be extracted to
+* `workflow_path`: the path within the repo containing the file defining the workflow that should trigger the deployment (e.g., `.github/workflows/build.ym`)
 
 
 ## Relevant documentation
