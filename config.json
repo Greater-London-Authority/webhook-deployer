@@ -1,0 +1,9 @@
+{
+    "listen": ":8080",
+    "secret": "THIS_IS_A_SECRET",
+    "GH_TOKEN": "THIS_IS_ALSO_A_SECRET!",
+
+    "projects": [
+        {"repository": "Greater-London-Authority/app-ev-charger-dashboard", "destination": "/var/www/html/ev-charger-dashboard", "workflow_path": ".github/workflows/build.yml"}
+    ]
+}
