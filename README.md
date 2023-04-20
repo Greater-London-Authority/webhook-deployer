@@ -1,6 +1,6 @@
 # Webook deployer
 
-This is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extacts its contents to a specified directory. 
+`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extacts its contents to a specified directory. 
 
 ## Motivating problem
 
@@ -32,11 +32,16 @@ Build: `go build .`
 
 ## Deployment
 
+### GitHub token
+
+In order to donload build artifacts, `webhook-deployer` needs to be provided a [fine-grained personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with  `Read-only` access to the `Actions` and `Metadata` Repository Permissions scopes.
+
+
 ### On the server
 
 Create a config file, using [`config.json`](./config.json) as a template.
 
-You then need to run the service, passing the name/path of the config file as ana rgument is if is not `./config.json`.
+You then need to run the service, passing the name/path of the config file as an argument is if is not `./config.json`.
 
 You can redirect logging output to a file and detatach with:
 
@@ -92,7 +97,7 @@ In the `Webhooks` section of the repo settings, you will also need to create a w
 
 ## Relevant documentation
 
+* [Getting a personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+* [GitHub Actions Documentation](https://docs.github.com/en/actions)
 * [Storing workflow data as artifacts](https://docs.github.com/en/actions/using-workflows/storing-workflow-data-as-artifacts)
-    
-
-
+* [GitHub Webhooks documentation](https://docs.github.com/en/webhooks-and-events/webhooks)
