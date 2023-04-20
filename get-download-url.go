@@ -20,7 +20,7 @@ type Response struct {
 	Artifacts  []Artifact `json:"artifacts"`
 }
 
-func GetDownloadURL(url string, token string) (string, error) {
+func getDownloadURL(url string, token string) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println("Error constructing GET request:", err)

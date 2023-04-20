@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 )
 
-func DownloadFromURL(url string, token string, destination string) error {
+func downloadFromURL(url string, token string, destination string) error {
 
 	client := &http.Client{}
 

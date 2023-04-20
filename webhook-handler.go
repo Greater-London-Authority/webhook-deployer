@@ -82,7 +82,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		} else {
 			log.Println("Handling workflow", data.Workflow.WorkflowPath, " in repo ", data.Repository.FullName)
 
-			downloadURL, err := GetDownloadURL(data.WorkflowRun.ArtifactsURL, config.GHToken)
+			downloadURL, err := getDownloadURL(data.WorkflowRun.ArtifactsURL, config.GHToken)
 
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -90,7 +90,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			err = DownloadFromURL(downloadURL, config.GHToken, destination)
+			err = downloadFromURL(downloadURL, config.GHToken, destination)
 			if err == nil {
 				log.Println("Handled workflow", data.Workflow.WorkflowPath, " in repo ", data.Repository.FullName, " and extracted to ", destination)
 				w.WriteHeader(http.StatusOK)
@@ -119,7 +119,7 @@ func main() {
 		configPath = "config.json"
 		log.Println("Using default config path (config.json)")
 	}
-	config := ReadConfig(configPath)
+	config := readConfig(configPath)
 
 	http.HandleFunc("/", getHandler(config))
 

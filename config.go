@@ -19,7 +19,7 @@ type ProjectConfig struct {
 	WorkflowPath string `json:"workflow_path"`
 }
 
-func ReadConfig(configPath string) Config {
+func readConfig(configPath string) Config {
 	config := Config{}
 
 	file, err := ioutil.ReadFile(configPath)
