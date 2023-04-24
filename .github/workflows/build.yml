@@ -64,7 +64,9 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.runner }}-go-${{ env.GO_VERSION }}-package-${{ hashFiles('go.sum') }}
 
       - name: Create packages
-        run: go build .
+        run: |
+          go build .
+          cp webhook-deployer webhook-deployer-${{ matrix.runner }}
         env:
           CGO_ENABLED: "0"
 
@@ -72,5 +74,5 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: packages
-          path: syncthing-linux-${{ matrix.runner }}-*.tar.gz
+          path: webhook-deployer-${{ matrix.runner }}
           
