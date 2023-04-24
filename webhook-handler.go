@@ -31,6 +31,11 @@ type Data struct {
 func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			http.NotFound(w, r)
+			return
+		}
+
 		event := r.Header.Get("X-GitHub-Event")
 		if event != "workflow_run" {
 			w.WriteHeader(http.StatusOK)
@@ -106,6 +111,11 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func healthcheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	return
+}
+
 func main() {
 	var configPath string
 
@@ -120,6 +130,8 @@ func main() {
 		log.Println("Using default config path (config.json)")
 	}
 	config := readConfig(configPath)
+
+	http.HandleFunc("/health", healthcheck)
 
 	http.HandleFunc("/", getHandler(config))
 
