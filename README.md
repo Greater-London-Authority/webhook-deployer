@@ -1,6 +1,8 @@
 # Webook deployer
 
-`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extracts its contents to a specified directory. 
+`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extracts its contents to a specified directory.
+Notifications of successfuly deploys can be sent to a [ntfy.sh](https://ntfy.sh/) topic.
+
 
 ## Motivating problem
 
@@ -39,18 +41,20 @@ In order to download build artifacts, `webhook-deployer` needs to be provided a 
 
 ### Running webhook-deployer
 
-Create a config file, using [`config.json`](./config.json) as a template.
+Create a config file, using [`config.json`](./config.json) as a template. The config file contains the following settings:
+
+* `GH_TOKEN`: an access token that can be used to download the build artifacts
+* `projects`: an array defining what repositories should be deployed, and where to         
+* (optional) `listen`: the interface to listen on (defaults to `":8080"`)
+* (optional) `secret`: the secret used by GitHub to sign webhook payloads
 
 You then need to run the service, passing the name/path of the config file as an argument is if is not `./config.json`.
-
-You can include the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful.
 
 You can redirect logging output to a file and detatch with:
 
     ./webhook-deployer webhook-config.json >> ./webhooks.log 2>&1
 
 You may want to proxy requests with a server such as nginx.
-
 
 ### Configuring deployment for a repository
 
@@ -106,7 +110,8 @@ Add an entry to the `projects` key of the config file, that specified:
 * `repository`: the full neame of the repository (e.g., *<org or account name>/<project name>*)
 * `destination`: the path on the system where the contents of the artifact zip file should be extracted to
 * `workflow_path`: the path within the repo containing the file defining the workflow that should trigger the deployment (e.g., `.github/workflows/build.ym`)
-
+* (optionally) `ntfy_topic`: the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful 
+    
 
 ## Relevant documentation
 
