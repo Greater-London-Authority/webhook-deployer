@@ -20,6 +20,18 @@ type ProjectConfig struct {
 	NtfyTopic    string `json:"ntfy_topic"`
 }
 
+func findFirstDuplicatedDestination(projects []ProjectConfig) string {
+	set := make(map[string]bool)
+	for _, project := range projects {
+		if _, alreadyExists := set[project.Destination]; alreadyExists {
+			return project.Destination
+		} else {
+			set[project.Destination] = true
+		}
+	}
+	return ""
+}
+
 func readConfig(configPath string) Config {
 	config := Config{}
 
@@ -35,6 +47,10 @@ func readConfig(configPath string) Config {
 
 	if config.GHToken == "" {
 		log.Panic("Config file doesn't include a GitHub token")
+	}
+
+	if duplicate := findFirstDuplicatedDestination(config.Projects); duplicate != "" {
+		log.Panic("Error in config file - more than one project uses the destination: ", duplicate)
 	}
 
 	return config
