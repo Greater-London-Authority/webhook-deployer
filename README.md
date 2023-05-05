@@ -105,9 +105,9 @@ In the `Webhooks` section of the repo settings, you will also need to create a w
 
 #### In the webhook-deployer config
 
-Add an entry to the `projects` key of the config file, that specified:
+Add an entry to the `projects` key of the config file, that specifies:
 
-* `repository`: the full neame of the repository (e.g., *<org or account name>/<project name>*)
+* `repository`: the full name of the repository (e.g., *<org or account name>/<project name>*)
 * `destination`: the path on the system where the contents of the artifact zip file should be extracted to
 * `workflow_path`: the path within the repo containing the file defining the workflow that should trigger the deployment (e.g., `.github/workflows/build.ym`)
 * (optionally) `ntfy_topic`: the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful 
