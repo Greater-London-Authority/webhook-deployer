@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type Repo struct {
@@ -15,6 +16,7 @@ type Repo struct {
 
 type WorkflowRun struct {
 	ArtifactsURL string `json:"artifacts_url"`
+	RunURL       string `json:"html_url"`
 }
 
 type Workflow struct {
@@ -74,9 +76,11 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var destination = ""
+		var ntfy_topic = ""
 		for _, project := range config.Projects {
 			if project.Repository == data.Repository.FullName && project.WorkflowPath == data.Workflow.WorkflowPath {
 				destination = project.Destination
+				ntfy_topic = project.NtfyTopic
 				break
 			}
 		}
@@ -99,6 +103,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			if err == nil {
 				log.Println("Handled workflow", data.Workflow.WorkflowPath, " in repo ", data.Repository.FullName, " and extracted to ", destination)
 				w.WriteHeader(http.StatusOK)
+				sendMsg(ntfy_topic, fmt.Sprintf("Handled workflow %s in repo %s and extracted to %s", data.Workflow.WorkflowPath, data.Repository.FullName, destination), data.WorkflowRun.RunURL)
 				return
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)
@@ -109,6 +114,19 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+}
+
+func sendMsg(topic string, msg string, url string) {
+	req, _ := http.NewRequest("POST", "https://ntfy.sh/"+topic, strings.NewReader(msg))
+	req.Header.Set("Title", "Succesful deployment")
+	req.Header.Set("Priority", "high")
+	req.Header.Set("Tags", "rocket")
+	req.Header.Set("Actions", fmt.Sprintf("view, View Workflow Run, %s, clear=true", url))
+	_, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		log.Println("Error sending message to ntfy.sh:", err)
+	}
 }
 
 func healthcheck(w http.ResponseWriter, r *http.Request) {

@@ -43,6 +43,8 @@ Create a config file, using [`config.json`](./config.json) as a template.
 
 You then need to run the service, passing the name/path of the config file as an argument is if is not `./config.json`.
 
+You can include the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful.
+
 You can redirect logging output to a file and detatch with:
 
     ./webhook-deployer webhook-config.json >> ./webhooks.log 2>&1
