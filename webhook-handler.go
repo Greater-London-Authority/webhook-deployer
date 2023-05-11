@@ -131,6 +131,7 @@ func sendMsg(topic string, msg string, url string) {
 
 func healthcheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
 	return
 }
 
