@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 // request for artifact
@@ -20,11 +21,11 @@ type Response struct {
 	Artifacts  []Artifact `json:"artifacts"`
 }
 
-func getDownloadURL(url string, token string) (string, error) {
+func getDownloadData(url string, token string) (Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println("Error constructing GET request:", err)
-		return "", errors.New("Error constructing GET request")
+		return Response{}, errors.New("Error constructing GET request")
 	}
 
 	req.Header.Add("Authorization", "Bearer "+token)
@@ -33,27 +34,44 @@ func getDownloadURL(url string, token string) (string, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error making GET request:", err)
-		return "", errors.New("Error making GET request")
+		return Response{}, errors.New("Error making GET request")
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response body from API:", err)
-		return "", errors.New("Error reading response body from API")
+		return Response{}, errors.New("Error reading response body from API")
 	}
 
 	var data Response
 	err = json.Unmarshal([]byte(body), &data)
 	if err != nil {
 		fmt.Println("Failed to parse JSON returned from API:", err)
-		return "", errors.New("Failed to parse JSON returned from API")
+		return Response{}, errors.New("Failed to parse JSON returned from API")
 	}
 
-	// fmt.Println(string(body))
+	return data, nil
+}
+
+func getDownloadURL(url string, token string) (string, error) {
+	data, err := getDownloadData(url, token)
+	if err != nil {
+		return "", err
+	}
+
+	if data.TotalCount == 0 {
+		fmt.Println("Total count of artifacts is not 0, so re-fetching after 5 seconds")
+		time.Sleep(5 * time.Second)
+
+		data, err = getDownloadData(url, token)
+		if err != nil {
+			return "", err
+		}
+	}
 
 	if data.TotalCount != 1 {
-		fmt.Println("Total count of artifacts is not 1, so ignoring")
+		fmt.Println(fmt.Sprintf("Total count of artifacts is %d not 1, so ignoring", data.TotalCount))
 		return "", errors.New("Total count of artifacts is not 1, so ignoring")
 	}
 
