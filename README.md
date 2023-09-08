@@ -1,12 +1,12 @@
 # Webook deployer
 
-`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifcat `.zip` file, and extracts its contents to a specified directory.
+`webhook-deployer` is a tool that listens for a `workflow_run.completed` webhook triggered by GitHub Actions, downloads the associated build artifact `.zip` file, and extracts its contents to a specified directory.
 Notifications of successfuly deploys can be sent to a [ntfy.sh](https://ntfy.sh/) topic.
 
 
 ## Motivating problem
 
-We have a large numebr of web applications. When one of these is updated, we want to perform a build process (typically running `npm run build`), then copy the static files to a server, where they are served by a web-server such as Caddy/Apache/nginx.
+We have a large number of web applications. When one of these is updated, we want to perform a build process (typically running `npm run build`), then copy the static files to a server, where they are served by a web-server such as Caddy/Apache/nginx.
 
 
 ### Alternative approaches
