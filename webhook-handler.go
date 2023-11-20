@@ -139,10 +139,10 @@ func main() {
 	var configPath string
 
 	if len(os.Args) >= 2 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
-		fmt.Println("Usage: webhook-handler <config file>")
+		log.Println("Usage: webhook-handler <config file>")
 		os.Exit(0)
 	} else if len(os.Args) >= 2 && os.Args != nil {
-		fmt.Println(os.Args[1])
+		log.Println("Using config path:",os.Args[1])
 		configPath = os.Args[1]
 	} else {
 		configPath = "config.json"
