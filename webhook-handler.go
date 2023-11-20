@@ -34,6 +34,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
+			log.Printf("Request for path other than / or /health (%s)\n", r.URL.Path)
 			http.NotFound(w, r)
 			return
 		}
@@ -142,7 +143,7 @@ func main() {
 		log.Println("Usage: webhook-handler <config file>")
 		os.Exit(0)
 	} else if len(os.Args) >= 2 && os.Args != nil {
-		log.Println("Using config path:",os.Args[1])
+		log.Println("Using config path:", os.Args[1])
 		configPath = os.Args[1]
 	} else {
 		configPath = "config.json"
