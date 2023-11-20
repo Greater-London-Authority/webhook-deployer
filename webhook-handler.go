@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -55,7 +55,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			log.Println("Cannot read the request body")
@@ -133,7 +133,6 @@ func sendMsg(topic string, msg string, url string) {
 func healthcheck(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
-	return
 }
 
 func main() {

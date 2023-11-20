@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -39,7 +38,7 @@ func getDownloadData(url string, token string) (Response, error) {
 	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Error reading response body from API:", err)
 		return Response{}, errors.New("Error reading response body from API")
@@ -72,7 +71,7 @@ func getDownloadURL(url string, token string) (string, error) {
 	}
 
 	if data.TotalCount != 1 {
-		log.Println(fmt.Sprintf("Total count of artifacts is %d not 1, so ignoring", data.TotalCount))
+		log.Printf("Total count of artifacts is %d not 1, so ignoring\n", data.TotalCount)
 		return "", errors.New("Total count of artifacts is not 1, so ignoring")
 	}
 

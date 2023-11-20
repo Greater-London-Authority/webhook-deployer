@@ -2,8 +2,8 @@ package main
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"log"
+	"os"
 )
 
 type Config struct {
@@ -35,7 +35,7 @@ func findFirstDuplicatedDestination(projects []ProjectConfig) string {
 func readConfig(configPath string) Config {
 	config := Config{}
 
-	file, err := ioutil.ReadFile(configPath)
+	file, err := os.ReadFile(configPath)
 	if err != nil {
 		log.Panic("Failed to read config file ", configPath, ":", err)
 	}
