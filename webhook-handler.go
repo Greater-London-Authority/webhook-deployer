@@ -77,11 +77,16 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var destination = ""
-		var ntfy_topic = ""
+		var ntfy_topics []string
+
 		for _, project := range config.Projects {
 			if project.Repository == data.Repository.FullName && project.WorkflowPath == data.Workflow.WorkflowPath {
 				destination = project.Destination
-				ntfy_topic = project.NtfyTopic
+				if (len(project.NtfyTopics) > 0){
+					ntfy_topics = project.NtfyTopics
+				} else if (len(project.NtfyTopic) > 0){
+					ntfy_topics = []string{project.NtfyTopic}
+				}
 				break
 			}
 		}
@@ -104,7 +109,9 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			if err == nil {
 				log.Println("Handled workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName, "and extracted to", destination)
 				w.WriteHeader(http.StatusOK)
-				sendMsg(ntfy_topic, fmt.Sprintf("Handled workflow %s in repo %s and extracted to %s", data.Workflow.WorkflowPath, data.Repository.FullName, destination), data.WorkflowRun.RunURL)
+				for _, ntfy_topic := range ntfy_topics {
+					sendMsg(ntfy_topic, fmt.Sprintf("Handled workflow %s in repo %s and extracted to %s", data.Workflow.WorkflowPath, data.Repository.FullName, destination), data.WorkflowRun.RunURL)
+				}
 				return
 			} else {
 				w.WriteHeader(http.StatusInternalServerError)

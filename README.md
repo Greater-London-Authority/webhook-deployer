@@ -110,8 +110,9 @@ Add an entry to the `projects` key of the config file, that specifies:
 * `repository`: the full name of the repository (e.g., *<org or account name>/<project name>*)
 * `destination`: the path on the system where the contents of the artifact zip file should be extracted to
 * `workflow_path`: the path within the repo containing the file defining the workflow that should trigger the deployment (e.g., `.github/workflows/build.ym`)
-* (optionally) `ntfy_topic`: the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful 
-    
+* (optionally) `ntfy_topic`: a string containing the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful 
+* (optionally) `ntfy_topics`: an array containing the names of [ntfy.sh](https://ntfy.sh/) topics to which a notification should be sent if a deployment is successful 
+
 
 ## Relevant documentation
 
