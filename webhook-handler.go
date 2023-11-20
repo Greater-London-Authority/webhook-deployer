@@ -88,9 +88,9 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 		if destination == "" {
 			w.WriteHeader(http.StatusOK)
-			log.Println("No action defined to match workflow", data.Workflow.WorkflowPath, " in repo ", data.Repository.FullName)
+			log.Println("No action defined to match workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName)
 		} else {
-			log.Println("Handling workflow", data.Workflow.WorkflowPath, " in repo ", data.Repository.FullName)
+			log.Println("Handling workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName)
 
 			downloadURL, err := getDownloadURL(data.WorkflowRun.ArtifactsURL, config.GHToken)
 
@@ -102,7 +102,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 			err = downloadFromURL(downloadURL, config.GHToken, destination)
 			if err == nil {
-				log.Println("Handled workflow", data.Workflow.WorkflowPath, " in repo ", data.Repository.FullName, " and extracted to ", destination)
+				log.Println("Handled workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName, "and extracted to", destination)
 				w.WriteHeader(http.StatusOK)
 				sendMsg(ntfy_topic, fmt.Sprintf("Handled workflow %s in repo %s and extracted to %s", data.Workflow.WorkflowPath, data.Repository.FullName, destination), data.WorkflowRun.RunURL)
 				return
