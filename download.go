@@ -4,7 +4,6 @@ import (
 	"archive/zip"
 	"errors"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -30,7 +29,7 @@ func downloadFromURL(url string, token string, destination string) error {
 	}
 	defer resp.Body.Close()
 
-	tmpDir, err := ioutil.TempDir("", "webhook-handler")
+	tmpDir, err := os.MkdirTemp("", "webhook-handler")
 	if err != nil {
 		log.Println("Error creating tmp dir to save zip file:", err)
 		return errors.New("Error creating tmp dir to save zip file")
