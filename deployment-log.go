@@ -10,14 +10,12 @@ import (
 )
 
 type DeployLogEntry struct {
-	// Project    string `json:"project"`
 	Commit     string `json:"commit"`
 	DeployedAt string `json:"deployed_at"`
 }
 
 type DeployLog struct {
 	Projects map[string]DeployLogEntry `json:""`
-	//	Entries []DeployLogEntry `json:"entries"`
 }
 
 var mu sync.Mutex
