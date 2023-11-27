@@ -17,6 +17,10 @@ type Repo struct {
 type WorkflowRun struct {
 	ArtifactsURL string `json:"artifacts_url"`
 	RunURL       string `json:"html_url"`
+	HeadCommit   struct {
+		ID string `json:"id"`
+	} `json:"head_commit"`
+	CreatedAt string `json:"created_at"`
 }
 
 type Workflow struct {
@@ -104,6 +108,9 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 				log.Println("Cannot get download URL")
 				return
 			}
+
+			// log the deployment
+			updateDeploymentLog(config.DeployLogPath, data.Repository.FullName, data.WorkflowRun.HeadCommit.ID, data.WorkflowRun.CreatedAt)
 
 			err = downloadFromURL(downloadURL, config.GHToken, destination)
 			if err == nil {

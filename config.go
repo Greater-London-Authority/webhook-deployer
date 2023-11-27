@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	Listen   string          `json:"listen"`
-	Secret   string          `json:"secret"`
-	GHToken  string          `json:"GH_TOKEN"`
-	Projects []ProjectConfig `json:"projects"`
+	Listen        string          `json:"listen"`
+	Secret        string          `json:"secret"`
+	GHToken       string          `json:"GH_TOKEN"`
+	Projects      []ProjectConfig `json:"projects"`
+	DeployLogPath string          `json:"deploy_log"`
 }
 
 type ProjectConfig struct {

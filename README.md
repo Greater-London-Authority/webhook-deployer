@@ -47,6 +47,7 @@ Create a config file, using [`config.json`](./config.json) as a template. The co
 * `projects`: an array defining what repositories should be deployed, and where to         
 * (optional) `listen`: the interface to listen on (defaults to `":8080"`)
 * (optional) `secret`: the secret used by GitHub to sign webhook payloads
+* (optional)  `deploy_log`: path to a JSON file which will record the commit hash and deployment time for the most recent deploy for each project
 
 You then need to run the service, passing the name/path of the config file as an argument is if is not `./config.json`.
 
