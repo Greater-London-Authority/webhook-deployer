@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 )
 
 type DeployLogEntry struct {
@@ -19,6 +20,8 @@ type DeployLog struct {
 	//	Entries []DeployLogEntry `json:"entries"`
 }
 
+var mu sync.Mutex
+
 func updateDeploymentLog(deployLogPath string, project string, commit string, deployedAt string) {
 
 	var deployLog DeployLog
@@ -27,7 +30,10 @@ func updateDeploymentLog(deployLogPath string, project string, commit string, de
 		return
 	}
 
-	// if file exists, load its contents
+	mu.Lock()
+	defer mu.Unlock()
+
+	// if file exists and is non-empty, load its contents
 	if _, err := os.Stat(deployLogPath); !errors.Is(err, os.ErrNotExist) {
 
 		file, err := os.ReadFile(deployLogPath)
@@ -35,10 +41,12 @@ func updateDeploymentLog(deployLogPath string, project string, commit string, de
 			log.Panic("Deployment log file exists but could not be read", deployLogPath, ":", err)
 		}
 
-		err = json.Unmarshal(file, &deployLog)
-		if err != nil {
-			fmt.Println(err)
-			return
+		if len(file) > 0 {
+			err = json.Unmarshal(file, &deployLog)
+			if err != nil {
+				fmt.Println("Error parsing deployment log:", err)
+				return
+			}
 		}
 	}
 
