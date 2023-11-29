@@ -61,7 +61,7 @@ func getDownloadURL(url string, token string) (string, error) {
 	}
 
 	if data.TotalCount == 0 {
-		log.Println("Total count of artifacts is not 0, so re-fetching after 5 seconds")
+		log.Println("Total count of artifacts is 0, so re-fetching after 5 seconds")
 		time.Sleep(5 * time.Second)
 
 		data, err = getDownloadData(url, token)
