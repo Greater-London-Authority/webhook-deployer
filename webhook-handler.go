@@ -35,6 +35,12 @@ type Data struct {
 	Workflow    Workflow    `json:"workflow"`
 }
 
+type DeleteData struct {
+	Repository Repo   `json:"repository"`
+	RefType    string `json:"ref_type"` // branch or tag
+	Ref        string `json:"ref"`      // branch or tag name
+}
+
 func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +74,54 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var data Data
+		var deleteData DeleteData
+
+		// first try to parse as a delete event
+		err = json.Unmarshal(body, &deleteData)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			log.Println("Cannot parse the request body")
+			return
+		}
+
+		if deleteData.RefType != "" {
+			log.Println("Received delete event for", deleteData.RefType, deleteData.Ref, "in repo", deleteData.Repository.FullName)
+
+			if deleteData.RefType != "branch" {
+				log.Println("Ignoring delete event for", deleteData.RefType, deleteData.Ref, "in repo", deleteData.Repository.FullName, "as not for a branch")
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			var destination = ""
+			for _, project := range config.Projects {
+				if project.Repository == data.Repository.FullName {
+					destination = project.Destination
+
+					if project.AllowBranchPreviews && deleteData.Ref != "master" && deleteData.Ref != "main" {
+						destination = destination + "-" + deleteData.Ref
+					}
+
+					break
+				}
+			}
+
+			if destination == "" {
+				log.Println("Not deleting, as no destination defined for repository", data.Repository.FullName)
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
+			err = os.RemoveAll(destination)
+			if err != nil {
+				log.Println("Error deleting", destination, ":", err)
+				return
+			}
+
+			return
+		}
+
+		// try to parse as a workflow_run event
 		err = json.Unmarshal(body, &data)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
