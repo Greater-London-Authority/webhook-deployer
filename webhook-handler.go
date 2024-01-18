@@ -73,10 +73,8 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		var data Data
-		var deleteData DeleteData
-
 		if event == "delete" {
+			var deleteData DeleteData
 
 			err = json.Unmarshal(body, &deleteData)
 			if err != nil {
@@ -95,7 +93,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 			var destination = ""
 			for _, project := range config.Projects {
-				if project.Repository == data.Repository.FullName {
+				if project.Repository == deleteData.Repository.FullName {
 					destination = project.Destination
 
 					if project.AllowBranchPreviews && deleteData.Ref != "master" && deleteData.Ref != "main" {
@@ -107,7 +105,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if destination == "" {
-				log.Println("Not deleting, as no destination defined for repository", data.Repository.FullName)
+				log.Println("Not deleting, as no destination defined for repository", deleteData.Repository.FullName)
 				w.WriteHeader(http.StatusOK)
 				return
 			}
@@ -122,6 +120,8 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if event == "workflow_run" {
+			var data Data
+
 			err = json.Unmarshal(body, &data)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
