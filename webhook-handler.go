@@ -51,9 +51,9 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		}
 
 		event := r.Header.Get("X-GitHub-Event")
-		if event != "workflow_run" {
+		if event != "workflow_run" && event != "delete" {
 			w.WriteHeader(http.StatusOK)
-			log.Println("X-GitHub-Event is not workflow_run, so ignoring")
+			log.Println("X-GitHub-Event is not workflow_run or delete, so ignoring")
 			return
 		}
 
@@ -76,15 +76,15 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		var data Data
 		var deleteData DeleteData
 
-		// first try to parse as a delete event
-		err = json.Unmarshal(body, &deleteData)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println("Cannot parse the request body")
-			return
-		}
+		if event == "delete" {
 
-		if deleteData.RefType != "" {
+			err = json.Unmarshal(body, &deleteData)
+			if err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				log.Println("Cannot parse the request body")
+				return
+			}
+
 			log.Println("Received delete event for", deleteData.RefType, deleteData.Ref, "in repo", deleteData.Repository.FullName)
 
 			if deleteData.RefType != "branch" {
@@ -121,71 +121,72 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// try to parse as a workflow_run event
-		err = json.Unmarshal(body, &data)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			log.Println("Cannot parse the request body")
-			return
-		}
-
-		if data.Action != "completed" {
-			w.WriteHeader(http.StatusOK)
-			log.Println("Action is not completed, so ignoring")
-			return
-		}
-
-		var destination = ""
-		var ntfy_topics []string
-
-		for _, project := range config.Projects {
-			if project.Repository == data.Repository.FullName && project.WorkflowPath == data.Workflow.WorkflowPath {
-				destination = project.Destination
-
-				if project.AllowBranchPreviews && data.WorkflowRun.HeadBranch != "master" && data.WorkflowRun.HeadBranch != "main" {
-					destination = destination + "-" + data.WorkflowRun.HeadBranch
-				}
-
-				if len(project.NtfyTopics) > 0 {
-					ntfy_topics = project.NtfyTopics
-				} else if len(project.NtfyTopic) > 0 {
-					ntfy_topics = []string{project.NtfyTopic}
-				}
-				break
-			}
-		}
-
-		if destination == "" {
-			w.WriteHeader(http.StatusOK)
-			log.Println("No action defined to match workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName)
-		} else {
-			log.Println("Handling workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName)
-
-			downloadURL, err := getDownloadURL(data.WorkflowRun.ArtifactsURL, config.GHToken)
-
+		if event == "workflow_run" {
+			err = json.Unmarshal(body, &data)
 			if err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
-				log.Println("Cannot get download URL")
+				log.Println("Cannot parse the request body")
 				return
 			}
 
-			// log the deployment
-			updateDeploymentLog(config.DeployLogPath, data.Repository.FullName, data.WorkflowRun.HeadCommit.ID, data.WorkflowRun.CreatedAt)
-
-			err = downloadFromURL(downloadURL, config.GHToken, destination)
-			if err == nil {
-				log.Println("Handled workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName, "and extracted to", destination)
+			if data.Action != "completed" {
 				w.WriteHeader(http.StatusOK)
-				for _, ntfy_topic := range ntfy_topics {
-					sendMsg(ntfy_topic, fmt.Sprintf("Handled workflow %s in repo %s and extracted to %s", data.Workflow.WorkflowPath, data.Repository.FullName, destination), data.WorkflowRun.RunURL)
-				}
+				log.Println("Action is not completed, so ignoring")
 				return
-			} else {
-				w.WriteHeader(http.StatusInternalServerError)
-				return
-				// TODO: pass error message
 			}
 
+			var destination = ""
+			var ntfy_topics []string
+
+			for _, project := range config.Projects {
+				if project.Repository == data.Repository.FullName && project.WorkflowPath == data.Workflow.WorkflowPath {
+					destination = project.Destination
+
+					if project.AllowBranchPreviews && data.WorkflowRun.HeadBranch != "master" && data.WorkflowRun.HeadBranch != "main" {
+						destination = destination + "-" + data.WorkflowRun.HeadBranch
+					}
+
+					if len(project.NtfyTopics) > 0 {
+						ntfy_topics = project.NtfyTopics
+					} else if len(project.NtfyTopic) > 0 {
+						ntfy_topics = []string{project.NtfyTopic}
+					}
+					break
+				}
+			}
+
+			if destination == "" {
+				w.WriteHeader(http.StatusOK)
+				log.Println("No action defined to match workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName)
+			} else {
+				log.Println("Handling workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName)
+
+				downloadURL, err := getDownloadURL(data.WorkflowRun.ArtifactsURL, config.GHToken)
+
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					log.Println("Cannot get download URL")
+					return
+				}
+
+				// log the deployment
+				updateDeploymentLog(config.DeployLogPath, data.Repository.FullName, data.WorkflowRun.HeadCommit.ID, data.WorkflowRun.CreatedAt)
+
+				err = downloadFromURL(downloadURL, config.GHToken, destination)
+				if err == nil {
+					log.Println("Handled workflow", data.Workflow.WorkflowPath, "in repo", data.Repository.FullName, "and extracted to", destination)
+					w.WriteHeader(http.StatusOK)
+					for _, ntfy_topic := range ntfy_topics {
+						sendMsg(ntfy_topic, fmt.Sprintf("Handled workflow %s in repo %s and extracted to %s", data.Workflow.WorkflowPath, data.Repository.FullName, destination), data.WorkflowRun.RunURL)
+					}
+					return
+				} else {
+					w.WriteHeader(http.StatusInternalServerError)
+					return
+					// TODO: pass error message
+				}
+
+			}
 		}
 	}
 
