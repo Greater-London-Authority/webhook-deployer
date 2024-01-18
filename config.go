@@ -15,11 +15,12 @@ type Config struct {
 }
 
 type ProjectConfig struct {
-	Repository   string   `json:"repository"`
-	Destination  string   `json:"destination"`
-	WorkflowPath string   `json:"workflow_path"`
-	NtfyTopic    string   `json:"ntfy_topic"`
-	NtfyTopics   []string `json:"ntfy_topics"`
+	Repository          string   `json:"repository"`
+	Destination         string   `json:"destination"`
+	WorkflowPath        string   `json:"workflow_path"`
+	NtfyTopic           string   `json:"ntfy_topic"`
+	NtfyTopics          []string `json:"ntfy_topics"`
+	AllowBranchPreviews bool     `json:"allow_branch_previews"`
 }
 
 func findFirstDuplicatedDestination(projects []ProjectConfig) string {

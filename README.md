@@ -113,6 +113,7 @@ Add an entry to the `projects` key of the config file, that specifies:
 * `workflow_path`: the path within the repo containing the file defining the workflow that should trigger the deployment (e.g., `.github/workflows/build.ym`)
 * (optionally) `ntfy_topic`: a string containing the name of a [ntfy.sh](https://ntfy.sh/) topic to which a notification should be sent if a deployment is successful 
 * (optionally) `ntfy_topics`: an array containing the names of [ntfy.sh](https://ntfy.sh/) topics to which a notification should be sent if a deployment is successful 
+* (opitionally) `allow_branch_previews`: if this is `true`, workflows run agiant branches other than `master` or `main` will be deployed to a directory whose name has `-<branch_name>` appended to the end
 
 
 ## Relevant documentation

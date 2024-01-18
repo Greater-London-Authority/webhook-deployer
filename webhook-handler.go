@@ -20,7 +20,8 @@ type WorkflowRun struct {
 	HeadCommit   struct {
 		ID string `json:"id"`
 	} `json:"head_commit"`
-	CreatedAt string `json:"created_at"`
+	HeadBranch string `json:"head_branch"`
+	CreatedAt  string `json:"created_at"`
 }
 
 type Workflow struct {
@@ -86,9 +87,14 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 		for _, project := range config.Projects {
 			if project.Repository == data.Repository.FullName && project.WorkflowPath == data.Workflow.WorkflowPath {
 				destination = project.Destination
-				if (len(project.NtfyTopics) > 0){
+
+				if project.AllowBranchPreviews && data.WorkflowRun.HeadBranch != "master" && data.WorkflowRun.HeadBranch != "main" {
+					destination = destination + "-" + data.WorkflowRun.HeadBranch
+				}
+
+				if len(project.NtfyTopics) > 0 {
 					ntfy_topics = project.NtfyTopics
-				} else if (len(project.NtfyTopic) > 0){
+				} else if len(project.NtfyTopic) > 0 {
 					ntfy_topics = []string{project.NtfyTopic}
 				}
 				break
