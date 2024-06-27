@@ -94,10 +94,8 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			var destination = ""
 			for _, project := range config.Projects {
 				if project.Repository == deleteData.Repository.FullName {
-					destination = project.Destination
-
 					if project.AllowBranchPreviews && deleteData.Ref != "master" && deleteData.Ref != "main" {
-						destination = destination + "-" + deleteData.Ref
+						destination = project.Destination + "-" + deleteData.Ref
 					}
 
 					break
