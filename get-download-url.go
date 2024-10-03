@@ -48,7 +48,7 @@ func getDownloadData(url string, token string) (Response, error) {
 	err = json.Unmarshal([]byte(body), &data)
 	if err != nil {
 		log.Println("Failed to parse JSON returned from API:", err)
-		return Response{}, errors.New("Failed to parse JSON returned from API")
+		return Response{}, errors.New("failed to parse JSON returned from API")
 	}
 
 	return data, nil
@@ -72,7 +72,7 @@ func getDownloadURL(url string, token string) (string, error) {
 
 	if data.TotalCount != 1 {
 		log.Printf("Total count of artifacts is %d not 1, so ignoring\n", data.TotalCount)
-		return "", errors.New("Total count of artifacts is not 1, so ignoring")
+		return "", errors.New("total count of artifacts is not 1, so ignoring")
 	}
 
 	return data.Artifacts[0].ArchiveDownloadURL, nil
