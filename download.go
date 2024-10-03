@@ -25,7 +25,7 @@ func downloadFromURL(url string, token string, destination string) error {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error constructing GET request for download:", err)
-		return errors.New("error downlaoding artifact")
+		return errors.New("error downloading artifact")
 	}
 	defer resp.Body.Close()
 
@@ -47,8 +47,8 @@ func downloadFromURL(url string, token string, destination string) error {
 	// log.Println("Saving to:", zipPath)
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
-		log.Println("Error saving downlaoded file to tmp dir:", err)
-		return errors.New("error saving downlaoded file to tmp dir")
+		log.Println("Error saving downloaded file to tmp dir:", err)
+		return errors.New("error saving downloaded file to tmp dir")
 	}
 
 	err = os.RemoveAll(destination)
