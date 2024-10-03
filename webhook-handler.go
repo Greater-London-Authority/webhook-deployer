@@ -192,7 +192,7 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 func sendMsg(topic string, msg string, url string) {
 	req, _ := http.NewRequest("POST", "https://ntfy.sh/"+topic, strings.NewReader(msg))
-	req.Header.Set("Title", "Succesful deployment")
+	req.Header.Set("Title", "Successful deployment")
 	req.Header.Set("Priority", "high")
 	req.Header.Set("Tags", "rocket")
 	req.Header.Set("Actions", fmt.Sprintf("view, View Workflow Run, %s, clear=true", url))
