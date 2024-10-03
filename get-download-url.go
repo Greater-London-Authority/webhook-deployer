@@ -25,7 +25,7 @@ func getDownloadData(url string, token string) (Response, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println("Error constructing GET request:", err)
-		return Response{}, errors.New("Error constructing GET request")
+		return Response{}, errors.New("error constructing GET request")
 	}
 
 	req.Header.Add("Authorization", "Bearer "+token)
@@ -34,14 +34,14 @@ func getDownloadData(url string, token string) (Response, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error making GET request:", err)
-		return Response{}, errors.New("Error making GET request")
+		return Response{}, errors.New("error making GET request")
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Println("Error reading response body from API:", err)
-		return Response{}, errors.New("Error reading response body from API")
+		return Response{}, errors.New("error reading response body from API")
 	}
 
 	var data Response
