@@ -114,22 +114,35 @@ func extractZipFile(zipPath string, destination string) error {
 			log.Println("Error extracting file from zip:", err)
 			return errors.New("error extracting file from zip")
 		}
-		defer zippedFile.Close()
 
-		extractedFile, err := os.Create(filepath.Join(destination, file.Name))
-		if err != nil {
-			log.Println("Error creating file to contain contents extracted from zip:", err)
-			return errors.New("error creating file to contain contents extracted from zip")
+		// N.B. we use these nested anonymous function to ensure files are closed on each loop iteration
+		// (rather than waiting until extractZipFile exits), avoiding exhausing file descriptors.
+		var extractionError error
+		func() {
+			defer zippedFile.Close()
+
+			extractedFile, err := os.Create(path)
+			if err != nil {
+				log.Println("Error creating file to contain contents extracted from zip:", err)
+				extractionError = errors.New("error creating file to contain contents extracted from zip")
+				return
+			}
+
+			func() {
+				defer extractedFile.Close()
+
+				_, err = io.Copy(extractedFile, zippedFile)
+				if err != nil {
+					log.Println("Error saving file extracted from zip:", err)
+					extractionError = errors.New("error saving file extracted from zip")
+				}
+			}()
+		}()
+
+		if extractionError != nil {
+			return extractionError
 		}
-		defer extractedFile.Close()
-
-		_, err = io.Copy(extractedFile, zippedFile)
-		if err != nil {
-			log.Println("Error saving file extracted from zip:", err)
-			return errors.New("error saving file extracted from zip")
-		}
-
-		// fmt.Printf("Extracted %s\n", file.Name)
 	}
+
 	return nil
 }
