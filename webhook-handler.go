@@ -57,20 +57,21 @@ func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		secret := os.Getenv("GITHUB_SECRET")
-		if secret != "" {
-			if !isValidSignature(r, secret) {
-				w.WriteHeader(http.StatusUnauthorized)
-				log.Println("X-Hub-Signature is not correct, so ignoring")
-				return
-			}
-		}
-
+		defer r.Body.Close()
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			log.Println("Cannot read the request body")
 			return
+		}
+
+		secret := config.Secret
+		if secret != "" {
+			if !isValidSignature(r, secret, body) {
+				w.WriteHeader(http.StatusUnauthorized)
+				log.Println("X-Hub-Signature is not correct, so ignoring")
+				return
+			}
 		}
 
 		if event == "delete" {
