@@ -218,7 +218,7 @@ func main() {
 	if len(os.Args) >= 2 && (os.Args[1] == "-h" || os.Args[1] == "--help") {
 		log.Println("Usage: webhook-handler <config file>")
 		os.Exit(0)
-	} else if len(os.Args) >= 2 && os.Args != nil {
+	} else if len(os.Args) >= 2 {
 		log.Println("Using config path:", os.Args[1])
 		configPath = os.Args[1]
 	} else {
