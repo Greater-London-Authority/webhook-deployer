@@ -76,8 +76,7 @@ The service uses a JSON configuration file to set its parameters. A sample confi
   The network interface and port on which the service listens (default is `":8080"`).
 
 - **secret** (string):
-  (Informational in the config file) The secret used by GitHub to sign webhook payloads.
-  **Note:** The service currently reads the secret from the `GITHUB_SECRET` environment variable to validate the signature.
+  The secret used by GitHub to sign webhook payloads.
 
 - **GH_TOKEN** (string):
   A fine-grained personal access token with read-only permissions for GitHub Actions and repository metadata. This token is required to download build artifacts.
@@ -155,7 +154,7 @@ This workflow runs whenever there is a push to the `main` branch (or it is trigg
 2. **Create a New Webhook:**
    - **Payload URL:** Set this to `http://<your-server-domain-or-ip>:8080/` (adjust the port if needed or if behind a reverse proxy).
    - **Content type:** Choose `application/json`.
-   - **Secret:** Provide a random secret. Make sure to set the environment variable `GITHUB_SECRET` on your deployment server to this same value so that incoming payloads can be validated.
+   - **Secret:** Provide a random secret. Make sure to record this value in the config file so that incoming payloads can be validated.
    - **Which events would you like to trigger this webhook?**
      Select **Let me select individual events** and then choose:
      - **Workflow runs** (for deployments)
