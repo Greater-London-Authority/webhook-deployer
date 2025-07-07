@@ -15,7 +15,7 @@ type DeployLogEntry struct {
 }
 
 type DeployLog struct {
-	Projects map[string]DeployLogEntry `json:""`
+	Projects map[string]DeployLogEntry `json:"Projects"`
 }
 
 var mu sync.Mutex
