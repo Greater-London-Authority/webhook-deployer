@@ -36,7 +36,8 @@ func updateDeploymentLog(deployLogPath string, project string, commit string, de
 
 		file, err := os.ReadFile(deployLogPath)
 		if err != nil {
-			log.Panic("Deployment log file exists but could not be read", deployLogPath, ":", err)
+			log.Println("Deployment log file exists but could not be read", deployLogPath, ":", err)
+			return
 		}
 
 		if len(file) > 0 {
