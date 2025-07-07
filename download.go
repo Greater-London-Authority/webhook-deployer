@@ -3,11 +3,13 @@ package main
 import (
 	"archive/zip"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func downloadFromURL(url string, token string, destination string) error {
@@ -87,8 +89,15 @@ func extractZipFile(zipPath string, destination string) error {
 	defer zipReader.Close()
 
 	for _, file := range zipReader.File {
-		//
-		path := filepath.Join(destination, file.Name)
+		// Sanitize path and ensure the sanitized path is within the destination directory
+		sanitizedPath := filepath.Join(destination, filepath.Clean(file.Name))
+		if !strings.HasPrefix(sanitizedPath, filepath.Clean(destination)+string(filepath.Separator)) {
+			msg := fmt.Sprintf("Invalid file path: %s", file.Name)
+			log.Print(msg)
+			return errors.New(msg)
+		}
+		path := sanitizedPath
+
 		if file.FileInfo().IsDir() {
 			// don't need to do anything: directory will be created when we extract files
 			continue
