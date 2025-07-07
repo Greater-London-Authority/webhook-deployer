@@ -24,9 +24,15 @@ func downloadFromURL(url string, token string, destination string) error {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Println("Error constructing GET request for download:", err)
+		log.Println("Error making GET request for download:", err)
 		return errors.New("error downloading artifact")
 	}
+
+	if resp.StatusCode != 200 {
+		log.Println("Error - received status code", resp.StatusCode, "for URL", url)
+		return errors.New("error downloading artifact")
+	}
+
 	defer resp.Body.Close()
 
 	tmpDir, err := os.MkdirTemp("", "webhook-handler")
