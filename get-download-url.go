@@ -60,6 +60,7 @@ func getDownloadURL(url string, token string) (string, error) {
 		return "", err
 	}
 
+	// this retry mechanism is quite ad-hoc, but in practice seems to work ok
 	if data.TotalCount == 0 {
 		log.Println("Total count of artifacts is 0, so re-fetching after 5 seconds")
 		time.Sleep(5 * time.Second)
