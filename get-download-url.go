@@ -70,6 +70,8 @@ func getDownloadURL(url string, token string) (string, error) {
 		}
 	}
 
+	// If there are 0 artifacts, there is nothing to deploy.
+	// If there is more than one artifact, we have no way of knowing which to deploy so do nothing rather than deploying the wrong one.
 	if data.TotalCount != 1 {
 		log.Printf("Total count of artifacts is %d not 1, so ignoring\n", data.TotalCount)
 		return "", errors.New("total count of artifacts is not 1, so ignoring")

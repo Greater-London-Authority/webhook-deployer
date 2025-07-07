@@ -142,6 +142,10 @@ jobs:
 
 This workflow runs whenever there is a push to the `main` branch (or it is triggered by a manual `workflow_dispatch`), and builds the project then uploads the `build` directory as an artifact.
 
+> [!IMPORTANT]
+> The workflow must upload exactly one artifact. If it does not upload any artifacts, there is nothing for the webhook-deployer to download. If it uploads multiple artifacts, webhook-deployer doesn't know which one should be deployed so does nothing.
+
+
 
 #### Configuring the GitHub Webhook
 
