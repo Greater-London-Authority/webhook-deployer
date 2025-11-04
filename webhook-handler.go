@@ -44,9 +44,25 @@ type DeleteData struct {
 func getHandler(config Config) func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
+
+		if r.URL.Path == "/" && r.Method == http.MethodGet {
+			w.WriteHeader(http.StatusOK)
+			_, err := w.Write([]byte("OK"))
+			if err != nil {
+				log.Println("Error writing healthcheck response")
+			}
+			return
+		}
+
 		if r.URL.Path != "/" {
 			log.Printf("Request for path other than / or /health (%s)\n", r.URL.Path)
 			http.NotFound(w, r)
+			return
+		}
+
+		if r.Method != http.MethodPost {
+			log.Printf("Rejecting request of method %s for URL %s\n", r.Method, r.URL.Path)
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 			return
 		}
 
@@ -205,6 +221,12 @@ func sendMsg(topic string, msg string, url string) {
 }
 
 func healthcheck(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		log.Printf("Rejecting request of method %s for URL %s\n", r.Method, r.URL.Path)
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte("OK"))
 	if err != nil {
