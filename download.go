@@ -19,7 +19,7 @@ func downloadFromURL(url string, token string, destination string) error {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Println("Error constructing GET request for download:", err)
-		return errors.New("error constructing GET request for download")
+		return fmt.Errorf("constructing GET request: %w", err)
 	}
 
 	req.Header.Add("Authorization", "Bearer "+token)
@@ -27,7 +27,7 @@ func downloadFromURL(url string, token string, destination string) error {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Error making GET request for download:", err)
-		return errors.New("error downloading artifact")
+		return fmt.Errorf("downloading artifact: %w", err)
 	}
 
 	if resp.StatusCode != 200 {
@@ -40,7 +40,7 @@ func downloadFromURL(url string, token string, destination string) error {
 	tmpDir, err := os.MkdirTemp("", "webhook-handler")
 	if err != nil {
 		log.Println("Error creating tmp dir to save zip file:", err)
-		return errors.New("error creating tmp dir to save zip file")
+		return fmt.Errorf("creating tmp dir: %w", err)
 	}
 	defer os.RemoveAll(tmpDir)
 
@@ -48,7 +48,7 @@ func downloadFromURL(url string, token string, destination string) error {
 	out, err := os.Create(zipPath)
 	if err != nil {
 		log.Println("Error creating file to save zip file to:", err)
-		return errors.New("error creating file to save zip file to")
+		return fmt.Errorf("creating file to save zip file to: %w", err)
 	}
 	defer out.Close()
 
@@ -56,25 +56,25 @@ func downloadFromURL(url string, token string, destination string) error {
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		log.Println("Error saving downloaded file to tmp dir:", err)
-		return errors.New("error saving downloaded file to tmp dir")
+		return fmt.Errorf("saving downloaded file to tmp dir: %w", err)
 	}
 
 	err = os.RemoveAll(destination)
 	if err != nil {
 		log.Println("Error removing existing files:", err)
-		return errors.New("error removing existing files")
+		return fmt.Errorf("removing existing files: %w", err)
 	}
 
 	err = os.MkdirAll(destination, 0777)
 	if err != nil {
 		log.Println("Error creating destination dir:", err)
-		return errors.New("error creating destination dir")
+		return fmt.Errorf("creating destination dir: %w", err)
 	}
 
 	err = extractZipFile(zipPath, destination)
 	if err != nil {
 		log.Println("Error extracting zip file:", err)
-		return errors.New("error extracting zip file")
+		return fmt.Errorf("extracting zip file: %w", err)
 	}
 
 	return nil
@@ -84,7 +84,7 @@ func extractZipFile(zipPath string, destination string) error {
 	zipReader, err := zip.OpenReader(zipPath)
 	if err != nil {
 		log.Println("Error opening zip file:", err)
-		return errors.New("error opening zip file")
+		return fmt.Errorf("opening zip file: %w", err)
 	}
 	defer zipReader.Close()
 
@@ -106,13 +106,13 @@ func extractZipFile(zipPath string, destination string) error {
 		err = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 		if err != nil {
 			log.Println("Error creating subdir to contain extracted file:", err)
-			return errors.New("error creating subdir to contain extracted file")
+			return fmt.Errorf("creating subdir to contain extracted file: %w", err)
 		}
 
 		zippedFile, err := file.Open()
 		if err != nil {
 			log.Println("Error extracting file from zip:", err)
-			return errors.New("error extracting file from zip")
+			return fmt.Errorf("extracting file from zip: %w", err)
 		}
 
 		// N.B. we use these nested anonymous function to ensure files are closed on each loop iteration
@@ -124,7 +124,7 @@ func extractZipFile(zipPath string, destination string) error {
 			extractedFile, err := os.Create(path)
 			if err != nil {
 				log.Println("Error creating file to contain contents extracted from zip:", err)
-				extractionError = errors.New("error creating file to contain contents extracted from zip")
+				extractionError = fmt.Errorf("creating file to contain contents extracted from zip: %w", err)
 				return
 			}
 
@@ -134,7 +134,7 @@ func extractZipFile(zipPath string, destination string) error {
 				_, err = io.Copy(extractedFile, zippedFile)
 				if err != nil {
 					log.Println("Error saving file extracted from zip:", err)
-					extractionError = errors.New("error saving file extracted from zip")
+					extractionError = fmt.Errorf("saving file extracted from zip: %w", err)
 				}
 			}()
 		}()
