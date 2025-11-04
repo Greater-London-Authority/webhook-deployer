@@ -24,6 +24,7 @@ type ProjectConfig struct {
 }
 
 func findFirstDuplicatedDestination(projects []ProjectConfig) string {
+	// Check that each project uses a unique destination directory; if not, return the first repeated directory.
 	set := make(map[string]bool)
 	for _, project := range projects {
 		if _, alreadyExists := set[project.Destination]; alreadyExists {
@@ -36,6 +37,7 @@ func findFirstDuplicatedDestination(projects []ProjectConfig) string {
 }
 
 func readConfig(configPath string) Config {
+	// N.B. We panic if we encounter any errors, as without a valid config we can't do anything useful.
 	config := Config{}
 
 	file, err := os.ReadFile(configPath)
